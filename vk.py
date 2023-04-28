@@ -27,22 +27,6 @@ class VK:
         response = requests.get(url, params={**self.params, **params})
         return response.json()
 
-    def search_groups(self, q, sorting=0):
-        """
-        Параметры sort
-        0 — сортировать по умолчанию (аналогично результатам поиска в полной версии сайта);
-        6 — сортировать по количеству пользователей.
-        """
-        params = {
-            'q': q,
-            'sort': sorting,
-            'count': 300
-        }
-        req = requests.get('https://api.vk.com/method/groups.search', params={**self.params, **params}).json()
-        #     pprint(req)
-        req = req['response']['items']
-        return req
-
     def get_photos(self,
                    owner_id,
                    album_id='profile',
@@ -77,11 +61,16 @@ class VK:
         while count > 0:
             params['offset'] = offset
             params['count'] = min(count, 1000)
-            response_part = requests.get(url=url, params={**self.params, **params}).json()
-            if 'error' in response_part:
-                print('VK ERROR:', response_part['error']['error_msg'])
+            response_part = requests.get(url=url, params={**self.params, **params})
+            res_body = response_part.json()
+
+            if 'error' in res_body:
+                print('VK ERROR:', res_body['error']['error_msg'])
             else:
-                photos += response_part['response']['items']
+                photos += res_body['response']['items']
+
+            response_part.raise_for_status()
+
             count -= min(count, 1000)
             offset += 1000
 
