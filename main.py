@@ -67,6 +67,9 @@ def main():
                     ya.upload_photos(f'{folder_name}/{photo["likes"]["count"]}.jpg',
                                      get_max_size(photo['sizes'])['url'])
 
+            if not os.path.exists('temp'):
+                os.makedirs('temp')
+
             with open('temp/vk_backup_photos.json', 'w') as f:
                 json.dump(vk_backup_photos, f, ensure_ascii=False, indent=4)
                 logging.info('Результат с информацией по фотографиям записан в файл "vk_backup_photos.json"')
